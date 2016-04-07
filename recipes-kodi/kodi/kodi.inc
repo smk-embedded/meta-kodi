@@ -6,7 +6,6 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=930e2a5f63425d8dd72dbd7391c43c46"
 
 DEPENDS = " \
-	libfslvpuwrap \
 	alsa-lib \
 	python \
 	python-distutils \
@@ -85,6 +84,7 @@ SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH}"
 S = "${WORKDIR}/git/"
 
 inherit autotools lib_package pkgconfig gettext python-dir
+
 EXTRA_OECONF=" --disable-debug \
 	--build=${BUILD_SYS} \
 	--host=${HOST_SYS} \
@@ -100,7 +100,6 @@ EXTRA_OECONF=" --disable-debug \
 	--disable-openmax \
 	--enable-gles \
 	--enable-udev \
-	--enable-codec=imxvpu \
 	--disable-texturepacker \
 	--enable-airplay \
 	--enable-airtunes \
@@ -109,7 +108,11 @@ EXTRA_OECONF=" --disable-debug \
 	--disable-mid \
 	--enable-rsxs \
 	--disable-libcec \
-	LIBS=' -llzma '"
+	LIBS=' -llzma ' \
+"
+PACKAGECONFIG ?= ""
+PACKAGECONFIG_mx6 += "imxvpu"
+PACKAGECONFIG[imxvpu] = "--enable-codec=imxvpu,,libfslvpuwrap"
 
 CXXFLAGS += " -I${STAGING_KERNEL_DIR}/include/uapi -I${STAGING_KERNEL_DIR}/include "
 CFLAGS += " -I${STAGING_KERNEL_DIR}/include/uapi -I${STAGING_KERNEL_DIR}/include "
