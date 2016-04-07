@@ -79,9 +79,7 @@ DEPENDS_append_mx6 = " virtual/kernel virtual/libgles2 virtual/egl "
 
 
 INC_PR = "r1"
-SRC_URI = "git://github.com/xbmc/xbmc.git;branch=Isengard"
-
-
+SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH}"
 S = "${WORKDIR}/git/"
 
 inherit autotools lib_package pkgconfig gettext python-dir
