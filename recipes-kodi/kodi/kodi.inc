@@ -71,6 +71,7 @@ DEPENDS = " \
 	ffmpeg-kodi \
 	libcec-imx \
 	libsquish \
+	libdcadec \
 "
 
 DEPENDS_append_mx6 = " virtual/kernel virtual/libgles2 virtual/egl "
