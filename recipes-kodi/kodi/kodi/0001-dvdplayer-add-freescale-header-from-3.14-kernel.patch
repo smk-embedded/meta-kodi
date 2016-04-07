@@ -1,0 +1,495 @@
+From 922b0413b5c31079d0fd22fa9cf57a1eba67b3b5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20M=C3=BCller-Klieser?= <s.mueller-klieser@phytec.de>
+Date: Thu, 7 Jan 2016 21:46:59 +0100
+Subject: [PATCH] dvdplayer: add freescale header from 3.14 kernel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We need those for the freescale EGL platform support.
+
+Poky has its sanitized kernel headers. So we cannot just include the
+freescale kernel header. Also working with two sets of kernel header is
+tricky. The easiest solution is to just copy the required includes over.
+
+Signed-off-by: Stefan Müller-Klieser <s.mueller-klieser@phytec.de>
+---
+ xbmc/cores/dvdplayer/linux/ipu.h   | 282 +++++++++++++++++++++++++++++++++++++
+ xbmc/cores/dvdplayer/linux/mxcfb.h | 176 +++++++++++++++++++++++
+ 2 files changed, 458 insertions(+)
+ create mode 100644 xbmc/cores/dvdplayer/linux/ipu.h
+ create mode 100644 xbmc/cores/dvdplayer/linux/mxcfb.h
+
+diff --git a/xbmc/cores/dvdplayer/linux/ipu.h b/xbmc/cores/dvdplayer/linux/ipu.h
+new file mode 100644
+index 0000000..b208328
+--- /dev/null
++++ b/xbmc/cores/dvdplayer/linux/ipu.h
+@@ -0,0 +1,282 @@
++/*
++ * Copyright (C) 2013 Freescale Semiconductor, Inc. All Rights Reserved
++ */
++
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++/*!
++ * @defgroup IPU MXC Image Processing Unit (IPU) Driver
++ */
++/*!
++ * @file uapi/linux/ipu.h
++ *
++ * @brief This file contains the IPU driver API declarations.
++ *
++ * @ingroup IPU
++ */
++
++#ifndef __ASM_ARCH_IPU_H__
++#define __ASM_ARCH_IPU_H__
++
++#include <linux/types.h>
++#include <linux/videodev2.h>
++
++#ifndef __KERNEL__
++#ifndef __cplusplus
++typedef unsigned char bool;
++#endif
++#define irqreturn_t int
++#define dma_addr_t int
++#define uint32_t unsigned int
++#define uint16_t unsigned short
++#define uint8_t unsigned char
++#define u32 unsigned int
++#define u8 unsigned char
++#define __u32 u32
++#endif
++
++/*!
++ * Enumeration of IPU rotation modes
++ */
++typedef enum {
++	/* Note the enum values correspond to BAM value */
++	IPU_ROTATE_NONE = 0,
++	IPU_ROTATE_VERT_FLIP = 1,
++	IPU_ROTATE_HORIZ_FLIP = 2,
++	IPU_ROTATE_180 = 3,
++	IPU_ROTATE_90_RIGHT = 4,
++	IPU_ROTATE_90_RIGHT_VFLIP = 5,
++	IPU_ROTATE_90_RIGHT_HFLIP = 6,
++	IPU_ROTATE_90_LEFT = 7,
++} ipu_rotate_mode_t;
++
++/*!
++ * Enumeration of VDI MOTION select
++ */
++typedef enum {
++	MED_MOTION = 0,
++	LOW_MOTION = 1,
++	HIGH_MOTION = 2,
++} ipu_motion_sel;
++
++/*!
++ * Enumeration of DI ports for ADC.
++ */
++typedef enum {
++	DISP0,
++	DISP1,
++	DISP2,
++	DISP3
++} display_port_t;
++
++/*  IPU Pixel format definitions */
++/*  Four-character-code (FOURCC) */
++#define fourcc(a, b, c, d)\
++	 (((__u32)(a)<<0)|((__u32)(b)<<8)|((__u32)(c)<<16)|((__u32)(d)<<24))
++
++/*!
++ * @name IPU Pixel Formats
++ *
++ * Pixel formats are defined with ASCII FOURCC code. The pixel format codes are
++ * the same used by V4L2 API.
++ */
++
++/*! @{ */
++/*! @name Generic or Raw Data Formats */
++/*! @{ */
++#define IPU_PIX_FMT_GENERIC fourcc('I', 'P', 'U', '0')	/*!< IPU Generic Data */
++#define IPU_PIX_FMT_GENERIC_32 fourcc('I', 'P', 'U', '1')	/*!< IPU Generic Data */
++#define IPU_PIX_FMT_GENERIC_16 fourcc('I', 'P', 'U', '2')	/*!< IPU Generic Data */
++#define IPU_PIX_FMT_LVDS666 fourcc('L', 'V', 'D', '6')	/*!< IPU Generic Data */
++#define IPU_PIX_FMT_LVDS888 fourcc('L', 'V', 'D', '8')	/*!< IPU Generic Data */
++/*! @} */
++/*! @name RGB Formats */
++/*! @{ */
++#define IPU_PIX_FMT_RGB332  fourcc('R', 'G', 'B', '1')	/*!<  8  RGB-3-3-2    */
++#define IPU_PIX_FMT_RGB555  fourcc('R', 'G', 'B', 'O')	/*!< 16  RGB-5-5-5    */
++#define IPU_PIX_FMT_RGB565  fourcc('R', 'G', 'B', 'P')	/*!< 1 6  RGB-5-6-5   */
++#define IPU_PIX_FMT_RGB666  fourcc('R', 'G', 'B', '6')	/*!< 18  RGB-6-6-6    */
++#define IPU_PIX_FMT_BGR666  fourcc('B', 'G', 'R', '6')	/*!< 18  BGR-6-6-6    */
++#define IPU_PIX_FMT_BGR24   fourcc('B', 'G', 'R', '3')	/*!< 24  BGR-8-8-8    */
++#define IPU_PIX_FMT_RGB24   fourcc('R', 'G', 'B', '3')	/*!< 24  RGB-8-8-8    */
++#define IPU_PIX_FMT_GBR24   fourcc('G', 'B', 'R', '3')	/*!< 24  GBR-8-8-8    */
++#define IPU_PIX_FMT_BGR32   fourcc('B', 'G', 'R', '4')	/*!< 32  BGR-8-8-8-8  */
++#define IPU_PIX_FMT_BGRA32  fourcc('B', 'G', 'R', 'A')	/*!< 32  BGR-8-8-8-8  */
++#define IPU_PIX_FMT_RGB32   fourcc('R', 'G', 'B', '4')	/*!< 32  RGB-8-8-8-8  */
++#define IPU_PIX_FMT_RGBA32  fourcc('R', 'G', 'B', 'A')	/*!< 32  RGB-8-8-8-8  */
++#define IPU_PIX_FMT_ABGR32  fourcc('A', 'B', 'G', 'R')	/*!< 32  ABGR-8-8-8-8 */
++/*! @} */
++/*! @name YUV Interleaved Formats */
++/*! @{ */
++#define IPU_PIX_FMT_YUYV    fourcc('Y', 'U', 'Y', 'V')	/*!< 16 YUV 4:2:2 */
++#define IPU_PIX_FMT_UYVY    fourcc('U', 'Y', 'V', 'Y')	/*!< 16 YUV 4:2:2 */
++#define IPU_PIX_FMT_YVYU    fourcc('Y', 'V', 'Y', 'U')  /*!< 16 YVYU 4:2:2 */
++#define IPU_PIX_FMT_VYUY    fourcc('V', 'Y', 'U', 'Y')  /*!< 16 VYYU 4:2:2 */
++#define IPU_PIX_FMT_Y41P    fourcc('Y', '4', '1', 'P')	/*!< 12 YUV 4:1:1 */
++#define IPU_PIX_FMT_YUV444  fourcc('Y', '4', '4', '4')	/*!< 24 YUV 4:4:4 */
++#define IPU_PIX_FMT_VYU444  fourcc('V', '4', '4', '4')	/*!< 24 VYU 4:4:4 */
++/* two planes -- one Y, one Cb + Cr interleaved  */
++#define IPU_PIX_FMT_NV12    fourcc('N', 'V', '1', '2') /* 12  Y/CbCr 4:2:0  */
++/* two planes -- 12  tiled Y/CbCr 4:2:0  */
++#define IPU_PIX_FMT_TILED_NV12    fourcc('T', 'N', 'V', 'P')
++#define IPU_PIX_FMT_TILED_NV12F   fourcc('T', 'N', 'V', 'F')
++
++/*! @} */
++/*! @name YUV Planar Formats */
++/*! @{ */
++#define IPU_PIX_FMT_GREY    fourcc('G', 'R', 'E', 'Y')	/*!< 8  Greyscale */
++#define IPU_PIX_FMT_YVU410P fourcc('Y', 'V', 'U', '9')	/*!< 9  YVU 4:1:0 */
++#define IPU_PIX_FMT_YUV410P fourcc('Y', 'U', 'V', '9')	/*!< 9  YUV 4:1:0 */
++#define IPU_PIX_FMT_YVU420P fourcc('Y', 'V', '1', '2')	/*!< 12 YVU 4:2:0 */
++#define IPU_PIX_FMT_YUV420P fourcc('I', '4', '2', '0')	/*!< 12 YUV 4:2:0 */
++#define IPU_PIX_FMT_YUV420P2 fourcc('Y', 'U', '1', '2')	/*!< 12 YUV 4:2:0 */
++#define IPU_PIX_FMT_YVU422P fourcc('Y', 'V', '1', '6')	/*!< 16 YVU 4:2:2 */
++#define IPU_PIX_FMT_YUV422P fourcc('4', '2', '2', 'P')	/*!< 16 YUV 4:2:2 */
++/* non-interleaved 4:4:4 */
++#define IPU_PIX_FMT_YUV444P fourcc('4', '4', '4', 'P')	/*!< 24 YUV 4:4:4 */
++/*! @} */
++#define IPU_PIX_FMT_TILED_NV12_MBALIGN	(16)
++#define TILED_NV12_FRAME_SIZE(w, h)	\
++		(ALIGN((w) * (h), SZ_4K) + ALIGN((w) * (h) / 2, SZ_4K))
++/* IPU device */
++typedef enum {
++	RGB_CS,
++	YUV_CS,
++	NULL_CS
++} cs_t;
++
++struct ipu_pos {
++	u32 x;
++	u32 y;
++};
++
++struct ipu_crop {
++	struct ipu_pos pos;
++	u32 w;
++	u32 h;
++};
++
++struct ipu_deinterlace {
++	bool	enable;
++	u8	motion; /*see ipu_motion_sel*/
++#define IPU_DEINTERLACE_FIELD_TOP	0
++#define IPU_DEINTERLACE_FIELD_BOTTOM	1
++#define IPU_DEINTERLACE_FIELD_MASK	\
++		(IPU_DEINTERLACE_FIELD_TOP | IPU_DEINTERLACE_FIELD_BOTTOM)
++	/* deinterlace frame rate double flags */
++#define IPU_DEINTERLACE_RATE_EN		0x80
++#define IPU_DEINTERLACE_RATE_FRAME1	0x40
++#define IPU_DEINTERLACE_RATE_MASK	\
++		(IPU_DEINTERLACE_RATE_EN | IPU_DEINTERLACE_RATE_FRAME1)
++#define IPU_DEINTERLACE_MAX_FRAME	2
++	u8	field_fmt;
++};
++
++struct ipu_input {
++	u32 width;
++	u32 height;
++	u32 format;
++	struct ipu_crop crop;
++	dma_addr_t paddr;
++
++	struct ipu_deinterlace deinterlace;
++	dma_addr_t paddr_n; /*valid when deinterlace enable*/
++};
++
++struct ipu_alpha {
++#define IPU_ALPHA_MODE_GLOBAL	0
++#define IPU_ALPHA_MODE_LOCAL	1
++	u8 mode;
++	u8 gvalue; /* 0~255 */
++	dma_addr_t loc_alp_paddr;
++};
++
++struct ipu_colorkey {
++	bool enable;
++	u32 value; /* RGB 24bit */
++};
++
++struct ipu_overlay {
++	u32	width;
++	u32	height;
++	u32	format;
++	struct ipu_crop crop;
++	struct ipu_alpha alpha;
++	struct ipu_colorkey colorkey;
++	dma_addr_t paddr;
++};
++
++struct ipu_output {
++	u32	width;
++	u32	height;
++	u32	format;
++	u8	rotate;
++	struct ipu_crop crop;
++	dma_addr_t paddr;
++};
++
++struct ipu_task {
++	struct ipu_input input;
++	struct ipu_output output;
++
++	bool overlay_en;
++	struct ipu_overlay overlay;
++
++#define IPU_TASK_PRIORITY_NORMAL 0
++#define IPU_TASK_PRIORITY_HIGH	1
++	u8	priority;
++
++#define	IPU_TASK_ID_ANY	0
++#define	IPU_TASK_ID_VF	1
++#define	IPU_TASK_ID_PP	2
++#define	IPU_TASK_ID_MAX 3
++	u8	task_id;
++
++	int	timeout;
++};
++
++enum {
++	IPU_CHECK_OK = 0,
++	IPU_CHECK_WARN_INPUT_OFFS_NOT8ALIGN = 0x1,
++	IPU_CHECK_WARN_OUTPUT_OFFS_NOT8ALIGN = 0x2,
++	IPU_CHECK_WARN_OVERLAY_OFFS_NOT8ALIGN = 0x4,
++	IPU_CHECK_ERR_MIN,
++	IPU_CHECK_ERR_INPUT_CROP,
++	IPU_CHECK_ERR_OUTPUT_CROP,
++	IPU_CHECK_ERR_OVERLAY_CROP,
++	IPU_CHECK_ERR_INPUT_OVER_LIMIT,
++	IPU_CHECK_ERR_OV_OUT_NO_FIT,
++	IPU_CHECK_ERR_OVERLAY_WITH_VDI,
++	IPU_CHECK_ERR_PROC_NO_NEED,
++	IPU_CHECK_ERR_SPLIT_INPUTW_OVER,
++	IPU_CHECK_ERR_SPLIT_INPUTH_OVER,
++	IPU_CHECK_ERR_SPLIT_OUTPUTW_OVER,
++	IPU_CHECK_ERR_SPLIT_OUTPUTH_OVER,
++	IPU_CHECK_ERR_SPLIT_WITH_ROT,
++	IPU_CHECK_ERR_NOT_SUPPORT,
++	IPU_CHECK_ERR_NOT16ALIGN,
++	IPU_CHECK_ERR_W_DOWNSIZE_OVER,
++	IPU_CHECK_ERR_H_DOWNSIZE_OVER,
++};
++
++/* IOCTL commands */
++#define IPU_CHECK_TASK		_IOWR('I', 0x1, struct ipu_task)
++#define IPU_QUEUE_TASK		_IOW('I', 0x2, struct ipu_task)
++#define IPU_ALLOC		_IOWR('I', 0x3, int)
++#define IPU_FREE		_IOW('I', 0x4, int)
++
++#endif
+diff --git a/xbmc/cores/dvdplayer/linux/mxcfb.h b/xbmc/cores/dvdplayer/linux/mxcfb.h
+new file mode 100644
+index 0000000..5682500
+--- /dev/null
++++ b/xbmc/cores/dvdplayer/linux/mxcfb.h
+@@ -0,0 +1,176 @@
++/*
++ * Copyright (C) 2013-2014 Freescale Semiconductor, Inc. All Rights Reserved
++ */
++
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++/*
++ * @file uapi/linux/mxcfb.h
++ *
++ * @brief Global header file for the MXC frame buffer
++ *
++ * @ingroup Framebuffer
++ */
++#ifndef __ASM_ARCH_MXCFB_H__
++#define __ASM_ARCH_MXCFB_H__
++
++#include <linux/fb.h>
++
++#define FB_SYNC_OE_LOW_ACT	0x80000000
++#define FB_SYNC_CLK_LAT_FALL	0x40000000
++#define FB_SYNC_DATA_INVERT	0x20000000
++#define FB_SYNC_CLK_IDLE_EN	0x10000000
++#define FB_SYNC_SHARP_MODE	0x08000000
++#define FB_SYNC_SWAP_RGB	0x04000000
++#define FB_ACCEL_TRIPLE_FLAG	0x00000000
++#define FB_ACCEL_DOUBLE_FLAG	0x00000001
++
++struct mxcfb_gbl_alpha {
++	int enable;
++	int alpha;
++};
++
++struct mxcfb_loc_alpha {
++	int enable;
++	int alpha_in_pixel;
++	unsigned long alpha_phy_addr0;
++	unsigned long alpha_phy_addr1;
++};
++
++struct mxcfb_color_key {
++	int enable;
++	__u32 color_key;
++};
++
++struct mxcfb_pos {
++	__u16 x;
++	__u16 y;
++};
++
++struct mxcfb_gamma {
++	int enable;
++	int constk[16];
++	int slopek[16];
++};
++
++struct mxcfb_rect {
++	__u32 top;
++	__u32 left;
++	__u32 width;
++	__u32 height;
++};
++
++#define GRAYSCALE_8BIT				0x1
++#define GRAYSCALE_8BIT_INVERTED			0x2
++#define GRAYSCALE_4BIT                          0x3
++#define GRAYSCALE_4BIT_INVERTED                 0x4
++
++#define AUTO_UPDATE_MODE_REGION_MODE		0
++#define AUTO_UPDATE_MODE_AUTOMATIC_MODE		1
++
++#define UPDATE_SCHEME_SNAPSHOT			0
++#define UPDATE_SCHEME_QUEUE			1
++#define UPDATE_SCHEME_QUEUE_AND_MERGE		2
++
++#define UPDATE_MODE_PARTIAL			0x0
++#define UPDATE_MODE_FULL			0x1
++
++#define WAVEFORM_MODE_AUTO			257
++
++#define TEMP_USE_AMBIENT			0x1000
++
++#define EPDC_FLAG_ENABLE_INVERSION		0x01
++#define EPDC_FLAG_FORCE_MONOCHROME		0x02
++#define EPDC_FLAG_USE_CMAP			0x04
++#define EPDC_FLAG_USE_ALT_BUFFER		0x100
++#define EPDC_FLAG_TEST_COLLISION		0x200
++#define EPDC_FLAG_GROUP_UPDATE			0x400
++#define EPDC_FLAG_USE_DITHERING_Y1		0x2000
++#define EPDC_FLAG_USE_DITHERING_Y4		0x4000
++
++#define FB_POWERDOWN_DISABLE			-1
++
++struct mxcfb_alt_buffer_data {
++	__u32 phys_addr;
++	__u32 width;	/* width of entire buffer */
++	__u32 height;	/* height of entire buffer */
++	struct mxcfb_rect alt_update_region;	/* region within buffer to update */
++};
++
++struct mxcfb_update_data {
++	struct mxcfb_rect update_region;
++	__u32 waveform_mode;
++	__u32 update_mode;
++	__u32 update_marker;
++	int temp;
++	unsigned int flags;
++	struct mxcfb_alt_buffer_data alt_buffer_data;
++};
++
++struct mxcfb_update_marker_data {
++	__u32 update_marker;
++	__u32 collision_test;
++};
++
++/*
++ * Structure used to define waveform modes for driver
++ * Needed for driver to perform auto-waveform selection
++ */
++struct mxcfb_waveform_modes {
++	int mode_init;
++	int mode_du;
++	int mode_gc4;
++	int mode_gc8;
++	int mode_gc16;
++	int mode_gc32;
++};
++
++/*
++ * Structure used to define a 5*3 matrix of parameters for
++ * setting IPU DP CSC module related to this framebuffer.
++ */
++struct mxcfb_csc_matrix {
++	int param[5][3];
++};
++
++#define MXCFB_WAIT_FOR_VSYNC	_IOW('F', 0x20, u_int32_t)
++#define MXCFB_SET_GBL_ALPHA     _IOW('F', 0x21, struct mxcfb_gbl_alpha)
++#define MXCFB_SET_CLR_KEY       _IOW('F', 0x22, struct mxcfb_color_key)
++#define MXCFB_SET_OVERLAY_POS   _IOWR('F', 0x24, struct mxcfb_pos)
++#define MXCFB_GET_FB_IPU_CHAN 	_IOR('F', 0x25, u_int32_t)
++#define MXCFB_SET_LOC_ALPHA     _IOWR('F', 0x26, struct mxcfb_loc_alpha)
++#define MXCFB_SET_LOC_ALP_BUF    _IOW('F', 0x27, unsigned long)
++#define MXCFB_SET_GAMMA	       _IOW('F', 0x28, struct mxcfb_gamma)
++#define MXCFB_GET_FB_IPU_DI 	_IOR('F', 0x29, u_int32_t)
++#define MXCFB_GET_DIFMT	       _IOR('F', 0x2A, u_int32_t)
++#define MXCFB_GET_FB_BLANK     _IOR('F', 0x2B, u_int32_t)
++#define MXCFB_SET_DIFMT		_IOW('F', 0x2C, u_int32_t)
++#define MXCFB_CSC_UPDATE	_IOW('F', 0x2D, struct mxcfb_csc_matrix)
++
++/* IOCTLs for E-ink panel updates */
++#define MXCFB_SET_WAVEFORM_MODES	_IOW('F', 0x2B, struct mxcfb_waveform_modes)
++#define MXCFB_SET_TEMPERATURE		_IOW('F', 0x2C, int32_t)
++#define MXCFB_SET_AUTO_UPDATE_MODE	_IOW('F', 0x2D, __u32)
++#define MXCFB_SEND_UPDATE		_IOW('F', 0x2E, struct mxcfb_update_data)
++#define MXCFB_WAIT_FOR_UPDATE_COMPLETE	_IOWR('F', 0x2F, struct mxcfb_update_marker_data)
++#define MXCFB_SET_PWRDOWN_DELAY		_IOW('F', 0x30, int32_t)
++#define MXCFB_GET_PWRDOWN_DELAY		_IOR('F', 0x31, int32_t)
++#define MXCFB_SET_UPDATE_SCHEME		_IOW('F', 0x32, __u32)
++#define MXCFB_GET_WORK_BUFFER		_IOWR('F', 0x34, unsigned long)
++#define MXCFB_DISABLE_EPDC_ACCESS	_IO('F', 0x35)
++#define MXCFB_ENABLE_EPDC_ACCESS	_IO('F', 0x36)
++#endif
+-- 
+1.9.1
+

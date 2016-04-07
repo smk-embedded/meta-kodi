@@ -1,8 +1,5 @@
-# Based on meta-stef by Wolfgar
-
 DESCRIPTION = "Kodi - Media player and entertainment hub"
 LICENSE = "GPLv2"
-
 LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=930e2a5f63425d8dd72dbd7391c43c46"
 
 DEPENDS = " \
@@ -81,6 +78,9 @@ DEPENDS_append_mx6 = " virtual/kernel virtual/libgles2 virtual/egl "
 
 INC_PR = "r1"
 SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH}"
+SRC_URI += " \
+	file://0001-dvdplayer-add-freescale-header-from-3.14-kernel.patch \
+"
 S = "${WORKDIR}/git/"
 
 inherit autotools lib_package pkgconfig gettext python-dir
@@ -113,9 +113,6 @@ EXTRA_OECONF=" --disable-debug \
 PACKAGECONFIG ?= ""
 PACKAGECONFIG_mx6 += "imxvpu"
 PACKAGECONFIG[imxvpu] = "--enable-codec=imxvpu,,libfslvpuwrap"
-
-CXXFLAGS += " -I${STAGING_KERNEL_DIR}/include/uapi -I${STAGING_KERNEL_DIR}/include "
-CFLAGS += " -I${STAGING_KERNEL_DIR}/include/uapi -I${STAGING_KERNEL_DIR}/include "
 
 FILES_${PN} += "/imx6 /usr/share/icons/hicolor"
 
