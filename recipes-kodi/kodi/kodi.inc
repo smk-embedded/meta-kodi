@@ -72,6 +72,7 @@ DEPENDS = " \
 	libcec-imx \
 	libsquish \
 	libdcadec \
+	crossguid \
 "
 
 DEPENDS_append_mx6 = " virtual/kernel virtual/libgles2 virtual/egl "
