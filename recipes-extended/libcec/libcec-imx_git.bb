@@ -14,5 +14,3 @@ S = "${WORKDIR}/git"
 
 # cec-client and xbmc may need the .so present to work :(
 #FILES_${PN} += "${libdir}/*.so"
-
-

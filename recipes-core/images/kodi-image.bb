@@ -8,5 +8,5 @@ IMAGE_FEATURES += "splash ssh-server-openssh tools-debug tools-profile debug-twe
 IMAGE_INSTALL += "\
     packagegroup-core-boot \
     kodi \
-    libdrm-tests \
+    python-pip \
 "

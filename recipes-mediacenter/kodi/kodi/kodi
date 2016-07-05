@@ -1,0 +1,22 @@
+#!/bin/sh
+killproc() {            # kill the named process(es)
+        pid=`/usr/bin/ps -e |
+             /usr/bin/grep -w $1 |
+             /usr/bin/sed -e 's/^  *//' -e 's/ .*//'`
+        [ "$pid" != "" ] && kill $pid
+}
+
+# Start/stop processes required for kodi
+
+case "$1" in
+
+'start')
+   /usr/bin/kodi --standalone -fs&
+   ;;
+'stop')
+   killproc kodi
+   ;;
+*)
+   echo "Usage: /etc/init.d/kodi { start | stop }"
+   ;;
+esac

@@ -1,0 +1,17 @@
+[Unit]
+Description=Kodi
+After=multi-user.target
+Requires=multi-user.target
+
+[Service]
+Environment=HOME=/home/root
+ExecStart=/usr/bin/kodi --standalone -fs
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=always
+RestartSec=3
+TimeoutStopSec=3
+ExecStartPre=-/bin/sh -c "echo 0 > /sys/devices/virtual/vtconsole/vtcon1/bind"
+ExecStopPost=-/bin/sh -c "echo 1 > /sys/devices/virtual/vtconsole/vtcon1/bind"
+
+[Install]
+WantedBy=multi-user.target
