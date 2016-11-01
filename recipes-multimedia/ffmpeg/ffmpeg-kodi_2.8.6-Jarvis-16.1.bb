@@ -8,17 +8,10 @@ S = "${WORKDIR}/FFmpeg-${PV}"
 
 PROVIDES = "ffmpeg"
 
+EXTRA_OECONF += "--disable-stripping"
 EXTRA_OECONF_remove = "--enable-avserver --enable-avplay"
 
 PACKAGECONFIG_append = " xz theora libvorbis"
 PACKAGECONFIG[xz] = "--enable-lzma,--disable-lzma,xz"
 
-INHIBIT_PACKAGE_STRIP = "1"
-
 FILES_${PN}-dev += "${datadir}"
-
-python populate_packages_prepend() {
-    pkgs = d.getVar('PACKAGES', True).split()
-    for pkg in pkgs:
-        d.appendVar('INSANE_SKIP_%s' % pkg, ' already-stripped')
-}
