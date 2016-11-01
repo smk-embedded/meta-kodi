@@ -6,6 +6,8 @@ SRC_URI[sha256sum] = "567171041491f6ea2eba9b4cda573cf864eeda67fd5c06a1bd82a2244e
 
 S = "${WORKDIR}/FFmpeg-${PV}"
 
+PROVIDES = "ffmpeg"
+
 EXTRA_OECONF_remove = "--enable-avserver --enable-avplay"
 
 PACKAGECONFIG_append = " xz theora libvorbis"
