@@ -1,0 +1,134 @@
+From b7b3cef9f8df2c1debb0d8ebbf71a879ac0d8533 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20M=C3=BCller-Klieser?=
+ <stefan.mueller-klieser@web.de>
+Date: Wed, 19 Oct 2016 14:09:55 +0200
+Subject: [PATCH 3/4] libcec-01-imx6-p8-platform
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Stefan Müller-Klieser <stefan.mueller-klieser@web.de>
+---
+ src/libcec/adapter/IMX/AdapterMessageQueue.h          |  8 ++++----
+ src/libcec/adapter/IMX/IMXCECAdapterCommunication.cpp |  8 ++++----
+ src/libcec/adapter/IMX/IMXCECAdapterCommunication.h   | 18 +++++++++---------
+ 3 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/src/libcec/adapter/IMX/AdapterMessageQueue.h b/src/libcec/adapter/IMX/AdapterMessageQueue.h
+index af6742c..00cb54c 100644
+--- a/src/libcec/adapter/IMX/AdapterMessageQueue.h
++++ b/src/libcec/adapter/IMX/AdapterMessageQueue.h
+@@ -31,11 +31,11 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "platform/threads/mutex.h"
++#include <p8-platform/threads/mutex.h>
+ 
+ namespace CEC
+ {
+-  using namespace PLATFORM;
++  using namespace P8PLATFORM;
+   
+   class CAdapterMessageQueueEntry
+   {
+@@ -124,8 +124,8 @@ namespace CEC
+     
+   private:    
+     bool                         m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
+-    PLATFORM::CCondition<bool>   m_condition;    /**< the condition to wait on */
+-    PLATFORM::CMutex             m_mutex;        /**< mutex for changes to this class */
++    P8PLATFORM::CCondition<bool>   m_condition;    /**< the condition to wait on */
++    P8PLATFORM::CMutex             m_mutex;        /**< mutex for changes to this class */
+     uint32_t                  	 m_hash;
+     uint32_t                     m_retval;
+     bool                         m_bSucceeded;
+diff --git a/src/libcec/adapter/IMX/IMXCECAdapterCommunication.cpp b/src/libcec/adapter/IMX/IMXCECAdapterCommunication.cpp
+index 2daa8cb..282306d 100644
+--- a/src/libcec/adapter/IMX/IMXCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/IMX/IMXCECAdapterCommunication.cpp
+@@ -32,9 +32,9 @@
+ 
+ #include "CECTypeUtils.h"
+ #include "LibCEC.h"
+-#include "platform/sockets/cdevsocket.h"
+-#include "platform/util/StdString.h"
+-#include "platform/util/buffer.h"
++#include <p8-platform/sockets/cdevsocket.h>
++#include <p8-platform/util/StdString.h>
++#include <p8-platform/util/buffer.h>
+ 
+ /*
+  * Ioctl definitions from kernel header
+@@ -62,7 +62,7 @@ typedef struct hdmi_cec_event{
+ 
+ using namespace std;
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #include "AdapterMessageQueue.h"
+ 
+diff --git a/src/libcec/adapter/IMX/IMXCECAdapterCommunication.h b/src/libcec/adapter/IMX/IMXCECAdapterCommunication.h
+index 9e899a3..b388fac 100644
+--- a/src/libcec/adapter/IMX/IMXCECAdapterCommunication.h
++++ b/src/libcec/adapter/IMX/IMXCECAdapterCommunication.h
+@@ -28,9 +28,9 @@
+ 
+ #if defined(HAVE_IMX_API)
+ 
+-#include "platform/threads/mutex.h"
+-#include "platform/threads/threads.h"
+-#include "platform/sockets/socket.h"
++#include <p8-platform/threads/mutex.h>
++#include <p8-platform/threads/threads.h>
++#include <p8-platform/sockets/socket.h>
+ #include "adapter/AdapterCommunication.h"
+ #include <map>
+ 
+@@ -39,7 +39,7 @@
+ 
+ 
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CCDevSocket;
+ };
+@@ -49,7 +49,7 @@ namespace CEC
+ {
+   class CAdapterMessageQueueEntry;
+ 
+-  class CIMXCECAdapterCommunication : public IAdapterCommunication, public PLATFORM::CThread
++  class CIMXCECAdapterCommunication : public IAdapterCommunication, public P8PLATFORM::CThread
+   {
+   public:
+     /*!
+@@ -90,7 +90,7 @@ namespace CEC
+     bool RegisterLogicalAddress(const cec_logical_address address);
+     ///}
+ 
+-    /** @name PLATFORM::CThread implementation */
++    /** @name P8PLATFORM::CThread implementation */
+     ///{
+     void *Process(void);
+     ///}
+@@ -104,12 +104,12 @@ namespace CEC
+     //cec_logical_addresses       m_logicalAddresses;
+     cec_logical_address         m_logicalAddress;
+ 
+-    PLATFORM::CMutex            m_mutex;
+-    PLATFORM::CCDevSocket       *m_dev;	/**< the device connection */
++    P8PLATFORM::CMutex            m_mutex;
++    P8PLATFORM::CCDevSocket       *m_dev;	/**< the device connection */
+     bool                        m_bLogicalAddressRegistered;
+     bool                        m_bInitialised;
+ 
+-    PLATFORM::CMutex            m_messageMutex;
++    P8PLATFORM::CMutex            m_messageMutex;
+     uint32_t                    m_iNextMessage;
+     std::map<uint32_t, CAdapterMessageQueueEntry *> m_messages;
+   };
+-- 
+2.5.0
+

@@ -1,0 +1,45 @@
+From 13bce76c1e4bb97f8308c7a3e69f5ba2d433ea4b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20M=C3=BCller-Klieser?=
+ <stefan.mueller-klieser@web.de>
+Date: Wed, 19 Oct 2016 14:08:52 +0200
+Subject: [PATCH 1/4] pr208: status merged
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Stefan Müller-Klieser <stefan.mueller-klieser@web.de>
+---
+ src/libcec/devices/CECBusDevice.cpp | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/src/libcec/devices/CECBusDevice.cpp b/src/libcec/devices/CECBusDevice.cpp
+index fc6f9bb..2e94765 100644
+--- a/src/libcec/devices/CECBusDevice.cpp
++++ b/src/libcec/devices/CECBusDevice.cpp
+@@ -1025,14 +1025,19 @@ bool CCECBusDevice::ActivateSource(uint64_t iDelay /* = 0 */)
+   bool bReturn(true);
+   if (iDelay == 0)
+   {
+-    /** some AVRs fail to be powered up by the TV when it powers up. power up the AVR explicitly */
++    /** send system audio mode request if AVR exists */
+     if (m_iLogicalAddress != CECDEVICE_AUDIOSYSTEM)
+     {
+       CCECBusDevice* audioSystem(m_processor->GetDevice(CECDEVICE_AUDIOSYSTEM));
+-      if (audioSystem && audioSystem->IsPresent() && audioSystem->GetPowerStatus(m_iLogicalAddress) != CEC_POWER_STATUS_ON)
++      if (audioSystem && audioSystem->IsPresent())
+       {
+-        LIB_CEC->AddLog(CEC_LOG_DEBUG, "powering up the AVR");
+-        audioSystem->PowerOn(m_iLogicalAddress);
++        cec_command command;
++
++        LIB_CEC->AddLog(CEC_LOG_DEBUG, "sending system audio mode request for '%s'", ToString(m_iLogicalAddress));
++        cec_command::Format(command, m_iLogicalAddress, CECDEVICE_AUDIOSYSTEM, CEC_OPCODE_SYSTEM_AUDIO_MODE_REQUEST);
++        command.parameters.PushBack((uint8_t) ((m_iPhysicalAddress >> 8) & 0xFF));
++        command.parameters.PushBack((uint8_t) (m_iPhysicalAddress & 0xFF));
++        bReturn = m_handler->Transmit(command, false, false);
+       }
+     }
+ 
+-- 
+2.5.0
+
