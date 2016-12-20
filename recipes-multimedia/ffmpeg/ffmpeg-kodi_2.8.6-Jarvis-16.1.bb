@@ -1,4 +1,4 @@
-include recipes-multimedia/libav/libav.inc
+require recipes-multimedia/ffmpeg/ffmpeg_3.1.3.bb
 
 SRC_URI = "https://github.com/xbmc/FFmpeg/archive/${PV}.tar.gz"
 SRC_URI[md5sum] = "7f60631a38e7fb604356c4649a1beb86"

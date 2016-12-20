@@ -1,24 +1,14 @@
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=930e2a5f63425d8dd72dbd7391c43c46"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS = "giflib libpng"
+DEPENDS = "giflib libpng squish"
 
 include kodi-git.inc
 
-inherit gettext
+inherit gettext autotools-brokensep
 
-do_configure () {
-}
+S_append := "/tools/depends/native/TexturePacker/src"
 
-CFLAGS += "-std=gnu99"
-export PREFIX="${prefix}"
-
-do_compile (){
-    make -C ${S}/tools/depends/native/TexturePacker/
-}
-
-do_install() {
-    install -Dm 775 ${S}/tools/depends/native/TexturePacker/bin/TexturePacker ${D}${bindir}/TexturePacker
-}
+EXTRA_OEMAKE = "AM_LDFLAGS="
 
 BBCLASSEXTEND = "native nativesdk"

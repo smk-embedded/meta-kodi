@@ -4,7 +4,7 @@ HOMEPAGE = "http://libcec.pulse-eight.com/"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e61fd86f9c947b430126181da2c6c715"
 
-DEPENDS = "udev lockdev p8-platform python"
+DEPENDS = "udev lockdev p8-platform python3"
 DEPENDS_rpi3 += "bcm2835-firmware"
 
 SRC_URI = "https://github.com/Pulse-Eight/libcec/archive/libcec-${PV}.tar.gz"
@@ -25,10 +25,9 @@ inherit cmake pkgconfig
 EXTRA_OECMAKE += " \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=1 \
-    -DCMAKE_PREFIX_PATH=${STAGING_DIR_HOST} \
 "
 EXTRA_OECMAKE_append_mx6 = " -DHAVE_IMX_API=1"
 
 PACKAGES += "python-cec"
-FILES_python-cec += "${libdir}/python*/*/cec"
+FILES_python-cec += "${bindir}/pyCecClient.py ${libdir}/python*/*/cec"
 FILES_${PN}-dbg += "${libdir}/python*/*/*/.debug"

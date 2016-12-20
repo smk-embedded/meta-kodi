@@ -1,0 +1,30 @@
+From b6bd0cf45c7330fd1fc01976e7ca16b7e4c95b88 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20M=C3=BCller-Klieser?=
+ <stefan.mueller-klieser@web.de>
+Date: Sat, 17 Dec 2016 20:42:44 +0100
+Subject: [PATCH] CxImage: HACK: fix compilation with gcc 6.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Stefan Müller-Klieser <stefan.mueller-klieser@web.de>
+---
+ lib/cximage-6.0/CxImage/ximadsp.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/cximage-6.0/CxImage/ximadsp.cpp b/lib/cximage-6.0/CxImage/ximadsp.cpp
+index 8425bb2..fd9b532 100644
+--- a/lib/cximage-6.0/CxImage/ximadsp.cpp
++++ b/lib/cximage-6.0/CxImage/ximadsp.cpp
+@@ -3477,6 +3477,8 @@ bool CxImage::AdaptiveThreshold(long method, long nBoxSize, CxImage* pContrastMa
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
++#undef min
++#undef max
+ #include <queue>
+ ////////////////////////////////////////////////////////////////////////////////
+ /**
+-- 
+2.5.0
+

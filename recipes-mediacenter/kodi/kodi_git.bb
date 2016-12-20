@@ -6,9 +6,10 @@ LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=930e2a5f63425d8dd72dbd7391c43c46"
 include kodi-git.inc
 
 SRC_URI += " \
-	file://0001-dvdplayer-add-freescale-header-from-3.14-kernel.patch \
-	file://kodi.service \
-	file://kodi \
+    file://0001-dvdplayer-add-freescale-header-from-3.14-kernel.patch \
+    file://0001-CxImage-HACK-fix-compilation-with-gcc-6.2.patch \
+    file://kodi.service \
+    file://kodi \
 "
 
 DEPENDS = "\
@@ -56,16 +57,14 @@ DEPENDS = "\
 	zlib \
 "
 DEPENDS += "\
-	cmake-native \
 	gperf-native \
-	gettext-native \
 	jsonschemabuilder-native \
 	swig-native \
 	texturepacker-native \
 	zip-native \
 "
 
-inherit autotools-brokensep python-dir systemd bluetooth
+inherit autotools-brokensep python-dir systemd bluetooth gettext
 
 SYSTEMD_SERVICE_${PN} = "kodi.service"
 
@@ -75,15 +74,13 @@ SYSTEMD_SERVICE_${PN} = "kodi.service"
 
 PACKAGECONFIG ??= "udev alsa airplay airtunes samba bluez5 nfs"
 PACKAGECONFIG_append_mx6 = " openglesv2 imx-vpu cec"
-RDEPENDS_${PN}_append_mx6 = " libegl libgles2-mx6 libgles2 libgal-mx6 libvivante-mx6 libopencl-mx6 libglslc-mx6 libclc-mx6"
+RDEPENDS_${PN}_append_mx6 = " kernel-module-imx-gpu-viv imx-gpu-viv"
 PACKAGECONFIG_append_x86 = " opengl wayland"
 RDEPENDS_${PN}_append_x86 = " weston weston-init mesa-megadriver"
 PACKAGECONFIG_append_x86-64 = " opengl wayland"
 RDEPENDS_${PN}_append_x86-64 = " weston weston-init mesa-megadriver"
 PACKAGECONFIG_append_raspberrypi3 = " openglesv2 cec openmax"
 EXTRA_OECONF_append_raspberrypi3 = " --enable-player=omxplayer --with-platform=raspberry-pi"
-#RDEPENDS_${PN}_append_raspberrypi3 = " omxplayer"
-#EXTRA_OEMAKE_append_raspberrypi3 = " -I=/usr/include/interface/vcos/pthreads -I=/usr/include/interfaces/vmcs_host/linux"
 EXTRA_OEMAKE_append_raspberrypi3 = " -lvcsm -lbcm_host -lvchostif"
 TARGET_LDFLAGS_append_raspberrypi3 = " -lvcsm -lbcm_host -lvchostif"
 
@@ -97,7 +94,6 @@ PACKAGECONFIG[alsa] = "--enable-alsa,--disable-alsa"
 PACKAGECONFIG[pulseaudio] = "--enable-pulse,--disable-pulse,pulseaudio"
 PACKAGECONFIG[airplay] = "--enable-airplay,--disable-airplay,libplist"
 PACKAGECONFIG[airtunes] = "--enable-airtunes,--disable-airtunes,shairplay"
-# kodi uses dlopen() for libcec so we need to add it manually
 PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
 #libusb is only required if no udev is available
 PACKAGECONFIG[libusb] = "--enable-libusb,,libusb1"
@@ -148,6 +144,7 @@ do_configure() {
     ./bootstrap
     oe_runconf
 }
+do_configure[dirs] = "${S}"
 
 do_compile_prepend() {
     for i in $(find . -name "Makefile") ; do
@@ -160,11 +157,11 @@ do_compile_prepend() {
 }
 
 do_install_append() {
-      if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
-                install -Dm 0644 ${WORKDIR}/kodi.service ${D}${systemd_unitdir}/system/kodi.service
-        else
-                install -Dm 0755 ${WORKDIR}/kodi ${D}${sysconfdir}/init.d/kodi
-        fi
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
+        install -Dm 0644 ${WORKDIR}/kodi.service ${D}${systemd_unitdir}/system/kodi.service
+    else
+        install -Dm 0755 ${WORKDIR}/kodi ${D}${sysconfdir}/init.d/kodi
+    fi
 }
 
 FILES_${PN} += "${libdir}/xbmc ${datadir}/xbmc ${datadir}/xsessions ${datadir}/icons ${systemd_unitdir}"

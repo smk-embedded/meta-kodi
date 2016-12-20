@@ -5,20 +5,22 @@ include kodi-git.inc
 
 inherit pkgconfig gettext
 
-S = "${WORKDIR}/git/tools/depends/native/libsquish-native/"
+S = "${WORKDIR}/git/tools/depends/native/libsquish-native/src"
 
 export PREFIX="${D}${prefix}"
-export NATIVEPREFIX="${D}${prefix}"
-export PLATFORM="${PACKAGE_ARCH}"
 
+do_configure (){
+    sed "s|@PREFIX@|${PREFIX}|" config.in > config
+    sed -i "s|@PREFIX@|${prefix}|" squish.pc.in
+}
 do_compile (){
-    oe_runmake $PLATFORM/libsquish.a
+    oe_runmake libsquish.a
 }
 
 do_install (){
     mkdir -p ${D}${prefix}/include
     mkdir -p ${D}${prefix}/lib/pkgconfig
-    oe_runmake
+    oe_runmake install
 }
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,7 +1,7 @@
-PACKAGECONFIG = "pcre8 pcre16 pcre32"
-EXTRA_OECONF += "\
-    --enable-unicode-properties \
-"
+#PACKAGECONFIG = "pcre8 pcre16 pcre32"
+#EXTRA_OECONF += "\
+#    --enable-unicode-properties \
+#"
 
 #    --with-link-size=4 \
 #EXTRA_OECONF_remove = "--with-link-size=2"
